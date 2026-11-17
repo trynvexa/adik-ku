@@ -38,7 +38,7 @@ export default function FinalScene({ onReset, onGoToMemories }) {
   };
 
   return (
-    <div className="relative mx-auto flex w-full max-w-sm flex-col items-center justify-center px-3 py-2 text-center select-none sm:max-w-md sm:py-5">
+    <div className="relative mx-auto flex w-full max-w-sm flex-col items-center justify-center px-3 py-1 text-center select-none sm:max-w-md sm:py-3">
       <FlowerAnimation count={10} />
       <HeartAnimation count={10} />
 
@@ -46,7 +46,7 @@ export default function FinalScene({ onReset, onGoToMemories }) {
         initial={{ opacity: 0, scale: 0.94 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.7 }}
-        className="relative w-full rounded-3xl border border-soft-pink/40 scene-paper p-4 text-dark-purple shadow-polaroid backdrop-blur-md sm:p-6"
+        className="relative w-full rounded-3xl border border-soft-pink/40 scene-paper p-3.5 text-dark-purple shadow-polaroid backdrop-blur-md sm:p-5"
       >
         <div className="washi-tape-mint pointer-events-none absolute -top-3 left-8 flex h-5 w-24 -rotate-2 items-center justify-center rounded-sm shadow-xs">
           <span className="text-[9px] font-dancing font-bold uppercase tracking-widest text-magenta">
@@ -60,19 +60,19 @@ export default function FinalScene({ onReset, onGoToMemories }) {
           <Sparkles className="h-3 w-3 animate-spin-slow text-magenta" />
         </div>
 
-        <h2 className="mt-1.5 text-2xl font-dancing font-bold leading-tight text-deep-magenta drop-shadow-xs sm:text-4xl">
+        <h2 className="mt-1 text-2xl font-dancing font-bold leading-tight text-deep-magenta drop-shadow-xs sm:text-3xl">
           Terima Kasih Sudah Hadir
         </h2>
 
-        <div className="mb-3 space-y-1.5 px-1 text-xs font-poppins leading-relaxed text-[#4A1532] sm:text-sm">
+        <div className="mb-2 space-y-1 px-1 text-xs font-poppins leading-relaxed text-[#4A1532] sm:text-sm">
           <p>Terima kasih sudah menjadi bagian dari kehidupan kakak.</p>
           <p>
             Mungkin hadiah ini sederhana, tetapi rasa syukur kakak karena mempunyai kamu tidak sesederhana itu.
           </p>
-          <p className="pt-0.5 text-sm font-semibold text-deep-magenta sm:text-base">
+          <p className="pt-0.5 text-xs font-semibold text-deep-magenta sm:text-sm">
             Kakak beruntung mempunyai kamu.
           </p>
-          <p className="pt-1 font-dancing text-xl font-bold text-magenta sm:text-2xl">
+          <p className="pt-0.5 font-dancing text-lg font-bold text-magenta sm:text-xl">
             Jangan lupa bahagia, ya, adikku. 💗
           </p>
         </div>
@@ -121,7 +121,21 @@ export default function FinalScene({ onReset, onGoToMemories }) {
           </span>
         </div>
 
-        <div className="mt-3 flex flex-col items-center border-t border-soft-pink/30 pt-2">
+        {/* Link to Heart Barcode Generator */}
+        <div className="my-1.5 flex flex-col items-center">
+          <a
+            href="./qr.html"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-magenta/10 border border-magenta/30 text-deep-magenta hover:bg-magenta/20 font-poppins text-[11px] font-semibold shadow-xs transition-all hover:scale-105 active:scale-95"
+          >
+            <span>💌</span>
+            <span>Buka Barcode Hati untuk Adik</span>
+            <span>✨</span>
+          </a>
+        </div>
+
+        <div className="mt-1.5 flex flex-col items-center border-t border-soft-pink/30 pt-1.5">
           <motion.div
             data-no-swipe
             role="button"

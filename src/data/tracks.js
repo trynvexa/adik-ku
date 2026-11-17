@@ -4,9 +4,14 @@ const cleanBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
 export const tracks = [
   {
     id: 1,
-    title: "Sebuah Lagu Untukmu",
-    artist: "Melodi Hangat Kakak",
+    title: "Glue Song",
+    artist: "beabadoobee",
     src: `${cleanBase}music/glue-song.mp3`,
   },
+  {
+    id: 2,
+    title: "Those Eyes",
+    artist: "New West",
+    src: `${cleanBase}music/those-eyes.mp3`,
+  },
 ];
-

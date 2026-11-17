@@ -56,7 +56,7 @@ export default function WelcomeScene({ onNext }) {
   const messageWords = "Haiii, adikku! Ada sesuatu yang ingin kakak tunjukkan. Ini memang sederhana, tetapi kakak membuatnya khusus untuk kamu.".split(" ");
 
   return (
-    <div className="relative flex flex-col items-center justify-center text-center px-3 py-2 sm:py-6 max-w-sm sm:max-w-md mx-auto w-full select-none">
+    <div className="relative flex flex-col items-center justify-center text-center px-3 py-1 sm:py-4 max-w-sm sm:max-w-md mx-auto w-full select-none">
       {/* 1. Multi-layered organic atmosphere: twinkling stars, sakura petals, ambient hearts */}
       <HeartAnimation count={14} />
 
@@ -65,7 +65,7 @@ export default function WelcomeScene({ onNext }) {
         initial={{ opacity: 0, y: 25, scale: 0.94, rotate: -1 }}
         animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="relative w-full rounded-3xl p-5 sm:p-7 shadow-polaroid border border-soft-pink/40 backdrop-blur-md overflow-visible"
+        className="relative w-full rounded-3xl p-4 sm:p-6 shadow-polaroid border border-soft-pink/40 backdrop-blur-md overflow-visible"
         style={{
           background: 'linear-gradient(145deg, rgba(255, 248, 242, 0.96) 0%, rgba(255, 238, 244, 0.94) 100%)',
           boxShadow: '0 10px 30px -5px rgba(45, 11, 46, 0.35), 0 20px 45px -10px rgba(214, 51, 132, 0.25)',
@@ -127,7 +127,7 @@ export default function WelcomeScene({ onNext }) {
         </motion.div>
 
         {/* The Handwritten Message with Staggered Word Reveal */}
-        <div className="relative mb-5 px-1 sm:px-3">
+        <div className="relative mb-3 sm:mb-4 px-1 sm:px-3">
           <p className="text-xs sm:text-sm text-[#4A1532] font-poppins leading-relaxed font-normal flex flex-wrap justify-center gap-x-1 gap-y-1">
             {messageWords.map((word, index) => (
               <motion.span

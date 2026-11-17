@@ -67,11 +67,11 @@ export default function GratitudeScene({ onNext }) {
           <Sparkles className="h-3 w-3 animate-spin-slow text-magenta" />
         </div>
 
-        <h2 className="mt-1.5 text-2xl font-dancing font-bold leading-tight text-deep-magenta drop-shadow-xs sm:text-4xl">
+        <h2 className="mt-1 text-2xl font-dancing font-bold leading-tight text-deep-magenta drop-shadow-xs sm:text-3xl">
           {gratitudeMessages.title}
         </h2>
 
-        <div className="mb-2.5 px-1">
+        <div className="mb-2 px-1">
           <p className="text-xs font-poppins leading-relaxed text-[#4A1532] sm:text-sm">
             {gratitudeMessages.intro}
           </p>
@@ -88,9 +88,9 @@ export default function GratitudeScene({ onNext }) {
                     initial={{ opacity: 0, x: -15, scale: 0.96 }}
                     animate={{ opacity: 1, x: 0, scale: 1 }}
                     transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                    className="relative flex items-center gap-2.5 rounded-xl border border-soft-pink/40 bg-white/80 p-2.5 shadow-xs sm:p-3"
+                    className="relative flex items-center gap-2 rounded-xl border border-soft-pink/40 bg-white/80 p-2 shadow-xs sm:p-2.5"
                   >
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr from-magenta to-soft-pink font-dancing text-xs font-bold text-white shadow-xs">
+                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr from-magenta to-soft-pink font-dancing text-[11px] font-bold text-white shadow-xs">
                       {index + 1}
                     </div>
 
@@ -107,7 +107,7 @@ export default function GratitudeScene({ onNext }) {
         </div>
 
         {/* Zero-Button UI: Subtle romantic progress cue */}
-        <div className="mt-3 flex flex-col items-center gap-0.5">
+        <div className="mt-2 flex flex-col items-center gap-0.5">
           <p className="text-[11px] font-dancing font-bold text-magenta">
             {allRevealed
               ? 'semua rasa syukur terukir indah untukmu 💖'

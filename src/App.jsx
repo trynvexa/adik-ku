@@ -245,7 +245,12 @@ function MainExperience() {
       </main>
 
       <footer className="relative z-20 shrink-0 pb-2 sm:pb-3">
-        <Navigation currentScene={currentScene} totalScenes={TOTAL_SCENES} />
+        <Navigation
+          currentScene={currentScene}
+          totalScenes={TOTAL_SCENES}
+          onNext={nextScene}
+          onPrev={prevScene}
+        />
       </footer>
     </div>
   );

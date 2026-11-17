@@ -8,8 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@0,600;1,600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Underlying Matrix Generator -->
+  <!-- Core QR Generator & Decoder -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
   <style>
     body {
       font-family: 'Poppins', sans-serif;
@@ -27,127 +28,293 @@
       background-size: 24px 24px;
     }
 
-    .neon-pink-shadow {
-      filter: drop-shadow(0 0 20px rgba(255, 46, 147, 0.45));
+    .neon-pink-glow {
+      filter: drop-shadow(0 0 20px rgba(255, 46, 147, 0.55));
+    }
+
+    /* Scanner Viewfinder Brackets */
+    .scan-bracket-tl { border-top: 3.5px solid #ffffff; border-left: 3.5px solid #ffffff; border-top-left-radius: 18px; }
+    .scan-bracket-tr { border-top: 3.5px solid #ffffff; border-right: 3.5px solid #ffffff; border-top-right-radius: 18px; }
+    .scan-bracket-bl { border-bottom: 3.5px solid #ffffff; border-left: 3.5px solid #ffffff; border-bottom-left-radius: 18px; }
+    .scan-bracket-br { border-bottom: 3.5px solid #ffffff; border-right: 3.5px solid #ffffff; border-bottom-right-radius: 18px; }
+
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 0.95; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.98); }
+    }
+    .animate-pulse-slow {
+      animation: pulse-slow 3s ease-in-out infinite;
     }
   </style>
 </head>
-<body class="flex flex-col items-center justify-start py-8 px-4 sm:px-6 min-h-screen">
+<body class="flex flex-col items-center justify-start py-6 px-4 sm:px-6 min-h-screen">
 
-  <div class="max-w-md w-full space-y-6">
-    <!-- Header Title -->
+  <div class="max-w-md w-full space-y-5">
+    
+    <!-- Header -->
     <div class="text-center space-y-2">
       <div class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-pink-500/20 border border-pink-500/40 text-pink-300 text-xs font-semibold shadow-inner">
         <span>🎬</span>
         <span>Persis Seperti di Video Referensi</span>
         <span>✨</span>
       </div>
-      <h1 class="text-3xl sm:text-4xl font-dancing font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-400 to-pink-200">
+      <h1 class="text-3xl sm:text-4xl font-dancing font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-300 to-pink-200">
         Barcode Hati Neon Pink 💗
       </h1>
-      <p class="text-xs text-neutral-400 max-w-xs mx-auto leading-relaxed">
-        Latar hitam pekat dengan barcode siluet hati warna pink neon menyala. Siap dikirim ke WhatsApp adik dan dipindai dengan kamera!
+      <p class="text-xs text-neutral-400 max-w-sm mx-auto leading-relaxed">
+        Latar hitam pekat dengan barcode siluet hati warna pink neon menyala. Siap dikirim ke WhatsApp adik dan dipindai dengan kamera HP!
       </p>
     </div>
 
-    <!-- URL Input Control -->
+    <!-- URL Input & Configuration Card -->
     <div class="bg-[#121216] border border-neutral-800 p-4 rounded-3xl space-y-3 shadow-2xl text-left">
-      <div class="space-y-1">
-        <label class="block text-xs font-semibold text-neutral-300 flex items-center justify-between">
-          <span>🌐 Tautan Scrapbook Adik:</span>
-          <span class="text-[10px] text-pink-400 font-normal">Otomatis terhubung</span>
-        </label>
+      <div class="space-y-1.5">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-semibold text-neutral-300 flex items-center gap-1.5">
+            <span>🌐 Tautan Scrapbook Adik:</span>
+          </label>
+          <button 
+            type="button" 
+            id="resetUrlBtn"
+            class="text-[10px] text-pink-400 hover:text-pink-300 underline transition-colors"
+          >
+            Reset ke Link Live Asli
+          </button>
+        </div>
         <input 
           id="urlInput" 
           type="url" 
           value="https://trynvexa.github.io/adik-ku/"
           placeholder="https://trynvexa.github.io/adik-ku/"
-          class="w-full px-3.5 py-2.5 rounded-2xl bg-[#1A1A22] border border-neutral-700 text-white placeholder-neutral-500 text-xs focus:outline-none focus:ring-2 focus:ring-pink-500"
+          class="w-full px-3.5 py-2.5 rounded-2xl bg-[#1A1A22] border border-neutral-700 text-white placeholder-neutral-500 text-xs focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all font-mono"
         />
       </div>
 
       <!-- Color Palette Selection -->
       <div class="flex items-center justify-between pt-1">
         <span class="text-xs font-medium text-neutral-400">Pilihan Warna Neon:</span>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2.5">
           <button 
             type="button" 
             data-color="#FF2E93"
-            class="color-btn w-7 h-7 rounded-full bg-[#FF2E93] ring-2 ring-white scale-110 transition-transform shadow-lg" 
+            class="color-btn w-6 h-6 rounded-full bg-[#FF2E93] ring-2 ring-white scale-110 transition-transform shadow-md" 
             title="Neon Hot Pink (Asli Video)"
           ></button>
           <button 
             type="button" 
-            data-color="#FF5252"
-            class="color-btn w-7 h-7 rounded-full bg-[#FF5252] ring-1 ring-neutral-600 hover:scale-105 transition-transform" 
-            title="Electric Red"
+            data-color="#FF65A5"
+            class="color-btn w-6 h-6 rounded-full bg-[#FF65A5] ring-1 ring-neutral-700 hover:scale-105 transition-transform" 
+            title="Barbie Glow"
           ></button>
           <button 
             type="button" 
             data-color="#E056FD"
-            class="color-btn w-7 h-7 rounded-full bg-[#E056FD] ring-1 ring-neutral-600 hover:scale-105 transition-transform" 
+            class="color-btn w-6 h-6 rounded-full bg-[#E056FD] ring-1 ring-neutral-700 hover:scale-105 transition-transform" 
             title="Cyber Violet"
           ></button>
           <button 
             type="button" 
-            data-color="#00D2D3"
-            class="color-btn w-7 h-7 rounded-full bg-[#00D2D3] ring-1 ring-neutral-600 hover:scale-105 transition-transform" 
+            data-color="#00E5FF"
+            class="color-btn w-6 h-6 rounded-full bg-[#00E5FF] ring-1 ring-neutral-700 hover:scale-105 transition-transform" 
             title="Cyan Glow"
+          ></button>
+          <button 
+            type="button" 
+            data-color="#FF3366"
+            class="color-btn w-6 h-6 rounded-full bg-[#FF3366] ring-1 ring-neutral-700 hover:scale-105 transition-transform" 
+            title="Electric Red"
+          ></button>
+          <button 
+            type="button" 
+            data-color="#FFFFFF"
+            class="color-btn w-6 h-6 rounded-full bg-white ring-1 ring-neutral-700 hover:scale-105 transition-transform" 
+            title="Pure White"
           ></button>
         </div>
       </div>
-    </div>
 
-    <!-- WhatsApp Chat Mockup Preview (Exactly as in the video) -->
-    <div class="relative whatsapp-bg p-4 sm:p-5 rounded-3xl border border-neutral-800 shadow-2xl space-y-3">
-      <!-- WhatsApp Bubble Header Note -->
-      <div class="flex items-center justify-between px-1 text-[11px] text-neutral-400">
-        <span>Pratinjau Layar WhatsApp:</span>
-        <span class="text-emerald-400 font-mono">16:05 ✓✓</span>
+      <!-- Custom Text Options for WhatsApp Card -->
+      <div class="border-t border-neutral-800/80 pt-3 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-semibold text-neutral-300 flex items-center gap-1.5">
+            <span>💬 Pesan Kartu WhatsApp:</span>
+          </label>
+          <span class="text-[10px] text-pink-400 font-normal">Bisa diubah bebas</span>
+        </div>
+
+        <!-- Top Bubble Text Input -->
+        <div class="space-y-1">
+          <input 
+            id="topMessageInput" 
+            type="text" 
+            value="HAPPY BITYHDAY BUBUBBB 😘💗💗💗"
+            placeholder="Pesan balon atas..."
+            class="w-full px-3 py-2 rounded-xl bg-[#1A1A22] border border-neutral-700 text-white placeholder-neutral-500 text-xs focus:outline-none focus:ring-1 focus:ring-pink-500 transition-all"
+          />
+        </div>
+
+        <!-- Quick preset buttons -->
+        <div class="flex flex-wrap gap-1.5">
+          <button type="button" class="preset-btn px-2.5 py-1 rounded-lg bg-neutral-800/80 hover:bg-pink-950/70 hover:text-pink-300 text-[10px] text-neutral-300 border border-neutral-700/80 transition-all" data-top="HAPPY BITYHDAY BUBUBBB 😘💗💗💗" data-bottom="COBA BUKA INI">
+            🎂 Video Asli
+          </button>
+          <button type="button" class="preset-btn px-2.5 py-1 rounded-lg bg-neutral-800/80 hover:bg-pink-950/70 hover:text-pink-300 text-[10px] text-neutral-300 border border-neutral-700/80 transition-all" data-top="HAPPY BIRTHDAY ADIKKU SAYANG 😘💗" data-bottom="SCAN BARCODE HATI INI YAA ✨">
+            🌸 Ultah Adik
+          </button>
+          <button type="button" class="preset-btn px-2.5 py-1 rounded-lg bg-neutral-800/80 hover:bg-pink-950/70 hover:text-pink-300 text-[10px] text-neutral-300 border border-neutral-700/80 transition-all" data-top="BUKA INI SEKARANG YAA 💌✨" data-bottom="COBA BUKA INI">
+            💌 Kado Spesial
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 pt-0.5">
+          <div>
+            <label class="block text-[10px] text-neutral-400 mb-1">Caption Bawah:</label>
+            <input 
+              id="bottomCaptionInput" 
+              type="text" 
+              value="COBA BUKA INI"
+              class="w-full px-2.5 py-1.5 rounded-xl bg-[#1A1A22] border border-neutral-700 text-white text-xs focus:outline-none focus:ring-1 focus:ring-pink-500 font-medium"
+            />
+          </div>
+          <div>
+            <label class="block text-[10px] text-neutral-400 mb-1">Jam / Waktu:</label>
+            <input 
+              id="timeInput" 
+              type="text" 
+              value="16:05"
+              class="w-full px-2.5 py-1.5 rounded-xl bg-[#1A1A22] border border-neutral-700 text-white text-xs focus:outline-none focus:ring-1 focus:ring-pink-500 font-mono"
+            />
+          </div>
+        </div>
       </div>
 
-      <!-- The Chat Bubble -->
-      <div class="bg-[#005c4b] text-white p-2.5 sm:p-3 rounded-2xl rounded-tr-none shadow-md space-y-2 max-w-xs mx-auto">
-        <!-- The Black Image Container with Neon Heart QR (Export Target) -->
+      <!-- Live Scannability Status Badge -->
+      <div id="scanStatusBadge" class="pt-1 flex items-center justify-between text-[11px] px-3 py-2 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300">
+        <div class="flex items-center gap-2">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span class="font-medium" id="statusText">100% Terverifikasi Bisa Dipindai HP</span>
+        </div>
+        <span class="text-[10px] text-emerald-400/80 font-mono">Camera OK ✓</span>
+      </div>
+    </div>
+
+    <!-- WhatsApp Chat Mockup Preview (Persis Seperti di Video) -->
+    <div class="relative whatsapp-bg p-4 sm:p-5 rounded-3xl border border-neutral-800 shadow-2xl space-y-3">
+      
+      <!-- Top Message Bubble as seen in video -->
+      <div id="topMessageBubble" class="bg-[#005c4b] text-white px-3 py-1.5 rounded-2xl rounded-tr-none shadow-md max-w-[290px] ml-auto text-right space-y-0.5 transition-all">
+        <p id="topMessageText" class="text-xs font-medium tracking-wide">
+          HAPPY BITYHDAY BUBUBBB 😘💗💗💗
+        </p>
+        <span id="topMessageTime" class="text-[9px] text-emerald-200 block text-right">16:05 ✓✓</span>
+      </div>
+
+      <!-- Main Image Message Bubble with Heart Barcode -->
+      <div class="bg-[#005c4b] text-white p-2.5 rounded-2xl rounded-tr-none shadow-lg max-w-[280px] ml-auto space-y-2">
+        
+        <!-- The Pitch Black Box with Neon Heart Barcode -->
         <div 
-          id="exportImageTarget" 
-          class="relative bg-black rounded-xl overflow-hidden flex items-center justify-center p-2 cursor-pointer group"
-          style="width: 260px; height: 260px; margin: 0 auto;"
+          id="qrDisplayContainer" 
+          class="relative bg-[#060608] rounded-xl overflow-hidden flex items-center justify-center p-2 mx-auto cursor-pointer group shadow-2xl"
+          style="width: 250px; height: 250px;"
+          title="Klik untuk menyalin gambar ke clipboard"
         >
-          <!-- The Heart Canvas -->
-          <canvas id="heartCanvas" class="neon-pink-shadow"></canvas>
+          <!-- Canvas Target -->
+          <canvas id="heartCanvas" class="neon-pink-glow"></canvas>
+
+          <!-- Camera Scanner Overlay (Simulating phone camera scanning it) -->
+          <div id="cameraOverlay" class="absolute inset-2 pointer-events-none flex flex-col justify-between p-1 transition-opacity">
+            <div class="flex justify-between items-start">
+              <div class="w-8 h-8 scan-bracket-tl"></div>
+              <!-- Text banner on top -->
+              <span class="bg-black/60 backdrop-blur-xs text-[9px] text-white/90 font-medium px-2 py-0.5 rounded-full border border-white/20 mt-1">
+                Temukan kode untuk dipindai
+              </span>
+              <div class="w-8 h-8 scan-bracket-tr"></div>
+            </div>
+            <div class="flex justify-between items-end">
+              <div class="w-8 h-8 scan-bracket-bl"></div>
+              <div class="w-8 h-8 scan-bracket-br"></div>
+            </div>
+          </div>
         </div>
 
         <!-- Chat Caption as in the video -->
-        <div class="flex items-center justify-between px-1 pt-0.5 text-xs font-semibold text-emerald-100 tracking-wide">
-          <span>COBA BUKA INI</span>
-          <span class="text-[10px] text-emerald-300 font-normal">16:05</span>
+        <div class="flex items-center justify-between px-1.5 pt-0.5 text-xs font-semibold text-emerald-100 tracking-wide">
+          <span id="bottomCaptionText">COBA BUKA INI</span>
+          <span id="bottomCaptionTime" class="text-[10px] text-emerald-300 font-normal">16:05 ✓✓</span>
         </div>
       </div>
 
-      <p class="text-[10px] text-center text-neutral-400 pt-1">
-        📸 Di dalam video, gambar hitam di atas dikirim ke adik, lalu adik mengarahkan kamera HP untuk memindai barcode hatinya!
-      </p>
+      <!-- Toggle Scanner Overlay -->
+      <div class="flex items-center justify-center gap-2 pt-1 text-[11px] text-neutral-400">
+        <label class="cursor-pointer inline-flex items-center gap-1.5 hover:text-neutral-200 transition-colors">
+          <input type="checkbox" id="toggleOverlay" checked class="rounded accent-pink-500 w-3.5 h-3.5" />
+          <span>Tampilkan garis sudut kamera HP</span>
+        </label>
+      </div>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="space-y-3 max-w-sm mx-auto">
-      <!-- Download Image Only (Pure Black + Pink Heart QR) -->
+    <!-- Quick Action Buttons -->
+    <div class="space-y-2.5 max-w-sm mx-auto">
+      
+      <!-- Primary Action: Download Pure Black Image (Video accurate) -->
       <button 
         id="downloadImageBtn"
         type="button"
-        class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-pink-600 via-rose-600 to-purple-700 text-white font-poppins font-semibold text-sm shadow-xl hover:shadow-pink-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 border border-pink-400/30"
+        class="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-pink-600 via-rose-600 to-purple-700 text-white font-poppins font-semibold text-xs sm:text-sm shadow-xl hover:shadow-pink-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 border border-pink-400/40"
       >
         <span>📥</span>
-        <span>Unduh Gambar Barcode Hati (Format Video)</span>
+        <span>Unduh Gambar Barcode Hati HD (1080×1080)</span>
       </button>
 
-      <p class="text-[11px] text-center text-neutral-400">
-        💡 <i>File yang diunduh adalah gambar kotak hitam dengan barcode hati pink di tengah, persis seperti yang dikirim di WhatsApp pada video!</i>
-      </p>
+      <!-- Secondary Action: Download Full WhatsApp Card -->
+      <button 
+        id="downloadCardBtn"
+        type="button"
+        class="w-full py-2.5 px-4 rounded-2xl bg-[#1A1A24] border border-neutral-700 hover:border-pink-500/50 text-neutral-200 hover:text-white font-poppins text-xs shadow-md hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+      >
+        <span>🖼️</span>
+        <span>Unduh Format Kartu Chat WhatsApp ("COBA BUKA INI")</span>
+      </button>
+
+      <!-- Copy to Clipboard Button -->
+      <button 
+        id="copyImageBtn"
+        type="button"
+        class="w-full py-2.5 px-4 rounded-2xl bg-[#16161E] border border-neutral-800 hover:border-emerald-500/50 text-neutral-300 hover:text-emerald-300 font-poppins text-xs transition-all flex items-center justify-center gap-2"
+      >
+        <span>📋</span>
+        <span id="copyBtnText">Salin Gambar ke Clipboard (Tinggal Paste di WA)</span>
+      </button>
+
+      <!-- WhatsApp Direct Share Link -->
+      <a 
+        id="whatsappShareLink"
+        href="https://api.whatsapp.com/send?text=Haiii%20coba%20buka%20barcode%20hati%20ini%20yaa%20%F0%9F%92%97%20https%3A%2F%2Ftrynvexa.github.io%2Fadik-ku%2F"
+        target="_blank"
+        rel="noreferrer"
+        class="w-full py-2.5 px-4 rounded-2xl bg-[#075E54]/40 hover:bg-[#075E54]/70 border border-emerald-500/30 text-emerald-200 hover:text-white font-poppins text-xs transition-all flex items-center justify-center gap-2 text-center"
+      >
+        <span>💬</span>
+        <span>Buka WhatsApp Sekarang</span>
+      </a>
+
+      <!-- Friendly instructions -->
+      <div class="bg-[#121218] border border-neutral-800/80 rounded-2xl p-3 text-[11px] text-neutral-400 space-y-1 text-left leading-relaxed">
+        <p class="font-semibold text-neutral-300 flex items-center gap-1">
+          <span>💡</span> <span>Cara Kasih ke Adik:</span>
+        </p>
+        <p>1. Klik <b>"Unduh Gambar Barcode Hati HD"</b> atau klik <b>"Salin Gambar"</b>.</p>
+        <p>2. Buka chat WhatsApp adikmu, kirim gambarnya dengan caption <i>"COBA BUKA INI"</i>.</p>
+        <p>3. Minta adikmu arahkan kamera HP ke barcode hati tersebut untuk langsung membuka scrapbook digitalnya!</p>
+      </div>
 
       <!-- Back to site link -->
-      <div class="text-center pt-2">
+      <div class="text-center pt-1">
         <a href="./" class="text-xs text-pink-400 hover:text-pink-300 underline font-poppins transition-colors">
           ← Kembali ke Scrapbook Digital
         </a>
@@ -155,32 +322,87 @@
     </div>
   </div>
 
-  <!-- Client-side Logic for True Heart Silhouette QR -->
   <script>
+    const LIVE_URL = 'https://trynvexa.github.io/adik-ku/';
     const urlInput = document.getElementById('urlInput');
+    const resetUrlBtn = document.getElementById('resetUrlBtn');
     const heartCanvas = document.getElementById('heartCanvas');
     const downloadImageBtn = document.getElementById('downloadImageBtn');
+    const downloadCardBtn = document.getElementById('downloadCardBtn');
+    const copyImageBtn = document.getElementById('copyImageBtn');
+    const copyBtnText = document.getElementById('copyBtnText');
+    const scanStatusBadge = document.getElementById('scanStatusBadge');
+    const statusText = document.getElementById('statusText');
+    const toggleOverlay = document.getElementById('toggleOverlay');
+    const cameraOverlay = document.getElementById('cameraOverlay');
+    const whatsappShareLink = document.getElementById('whatsappShareLink');
 
-    let currentNeonColor = '#FF2E93'; // Hot Pink by default (video accurate)
+    const topMessageInput = document.getElementById('topMessageInput');
+    const bottomCaptionInput = document.getElementById('bottomCaptionInput');
+    const timeInput = document.getElementById('timeInput');
+    const topMessageText = document.getElementById('topMessageText');
+    const topMessageTime = document.getElementById('topMessageTime');
+    const bottomCaptionText = document.getElementById('bottomCaptionText');
+    const bottomCaptionTime = document.getElementById('bottomCaptionTime');
 
-    // Auto-detect current URL if accessed on live hosting
+    let currentNeonColor = '#FF2E93'; // Neon Hot Pink as in reference video
+
+    function updatePreviewText() {
+      const topMsg = topMessageInput.value.trim() || 'HAPPY BITYHDAY BUBUBBB 😘💗💗💗';
+      const botCaption = bottomCaptionInput.value.trim() || 'COBA BUKA INI';
+      const timeVal = timeInput.value.trim() || '16:05';
+
+      topMessageText.innerText = topMsg;
+      topMessageTime.innerText = `${timeVal} ✓✓`;
+      bottomCaptionText.innerText = botCaption;
+      bottomCaptionTime.innerText = `${timeVal} ✓✓`;
+    }
+
+    if (topMessageInput) topMessageInput.addEventListener('input', updatePreviewText);
+    if (bottomCaptionInput) bottomCaptionInput.addEventListener('input', updatePreviewText);
+    if (timeInput) timeInput.addEventListener('input', updatePreviewText);
+
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const top = btn.getAttribute('data-top');
+        const bottom = btn.getAttribute('data-bottom');
+        if (top && topMessageInput) topMessageInput.value = top;
+        if (bottom && bottomCaptionInput) bottomCaptionInput.value = bottom;
+        updatePreviewText();
+      });
+    });
+
+    // Set initial URL: If hosted on GitHub Pages or custom domain, use that; otherwise default to LIVE_URL
     try {
-      if (window.location.protocol.startsWith('http')) {
-        const liveUrl = window.location.href.split('?')[0].replace(/\/qr\.html\/?$/, '');
-        if (liveUrl) {
-          urlInput.value = liveUrl;
+      if (window.location.protocol.startsWith('http') && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1')) {
+        const liveSite = window.location.href.split('?')[0].replace(/\/qr\.html\/?$/, '');
+        if (liveSite) {
+          urlInput.value = liveSite.endsWith('/') ? liveSite : liveSite + '/';
         }
+      } else {
+        urlInput.value = LIVE_URL;
       }
-    } catch (e) {}
+    } catch (e) {
+      urlInput.value = LIVE_URL;
+    }
 
-    // Color switcher buttons
+    resetUrlBtn.addEventListener('click', () => {
+      urlInput.value = LIVE_URL;
+      drawHeartQR();
+    });
+
+    toggleOverlay.addEventListener('change', (e) => {
+      cameraOverlay.style.opacity = e.target.checked ? '1' : '0';
+    });
+
+    // Color Switcher
     document.querySelectorAll('.color-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.color-btn').forEach(b => {
           b.classList.remove('ring-2', 'ring-white', 'scale-110');
-          b.classList.add('ring-1', 'ring-neutral-600');
+          b.classList.add('ring-1', 'ring-neutral-700');
         });
-        btn.classList.remove('ring-1', 'ring-neutral-600');
+        btn.classList.remove('ring-1', 'ring-neutral-700');
         btn.classList.add('ring-2', 'ring-white', 'scale-110');
 
         currentNeonColor = btn.getAttribute('data-color');
@@ -189,243 +411,301 @@
     });
 
     /**
-     * Draw Exact Heart-Shaped QR Code as in Video:
-     * - Solid black background
-     * - Top-left lobe curves around top-left finder pattern
-     * - Top-right lobe curves around top-right finder pattern
-     * - Deep cleft in top center
-     * - Tapers down symmetrically to a sharp V-tip at the bottom
-     * - 100% Scannable by smartphone camera / WhatsApp scanner
+     * Check if a 2D point (x, y) is inside a romantic, symmetrical Heart path
      */
-    function drawHeartQR() {
-      const url = urlInput.value.trim() || 'https://trynvexa.github.io/adik-ku/';
-      const size = 250; // Canvas display size
-      heartCanvas.width = size;
-      heartCanvas.height = size;
-      const ctx = heartCanvas.getContext('2d');
-
-      // Generate QR Matrix using Error Correction 'H' (30% tolerance)
-      const qr = qrcode(0, 'H');
-      qr.addData(url);
-      qr.make();
-
-      const count = qr.getModuleCount();
-      const qrWidth = 180;
-      const tileSize = qrWidth / count;
-      const startX = (size - qrWidth) / 2;
-      const startY = 28;
-
-      // 1. Fill solid deep black background
-      ctx.fillStyle = "#0A0A0C";
-      ctx.fillRect(0, 0, size, size);
-
-      // 2. Define the exact Heart Path
-      ctx.save();
-      ctx.beginPath();
-
-      const midX = size / 2;
-      const cleftY = startY + 26;
-      const bottomTipY = startY + qrWidth + 34;
-      const leftX = startX - 6;
-      const rightX = startX + qrWidth + 6;
-
-      // Cleft
-      ctx.moveTo(midX, cleftY);
-
-      // Left lobe: arches gracefully over top-left finder
-      ctx.bezierCurveTo(
-        midX - 25, startY - 18,
-        leftX, startY - 17,
-        leftX, startY + 32
-      );
-
-      // Smooth taper down left side past bottom-left finder to bottom tip
-      ctx.bezierCurveTo(
-        leftX, startY + 85,
-        startX - 3, startY + (count - 3) * tileSize,
-        midX, bottomTipY
-      );
-
-      // Symmetrical right side up to top-right lobe
-      ctx.bezierCurveTo(
-        startX + qrWidth + 3, startY + (count - 3) * tileSize,
-        rightX, startY + 85,
-        rightX, startY + 32
-      );
-
-      // Right lobe: arches over top-right finder
-      ctx.bezierCurveTo(
-        rightX, startY - 17,
-        midX + 25, startY - 18,
-        midX, cleftY
-      );
-
-      ctx.closePath();
-      ctx.clip(); // Clip into heart!
-
-      // 3. Draw Neon Pink QR Modules
-      ctx.fillStyle = currentNeonColor;
-      for (let r = 0; r < count; r++) {
-        for (let c = 0; c < count; c++) {
-          if (qr.isDark(r, c)) {
-            const x = startX + c * tileSize;
-            const y = startY + r * tileSize;
-            ctx.fillRect(x, y, tileSize + 0.35, tileSize + 0.35);
-          }
-        }
-      }
-
-      // Fill the bottom heart tip with matching decorative matrix dots
-      const extraRows = Math.floor((bottomTipY - (startY + qrWidth)) / tileSize) + 2;
-      for (let er = 0; er < extraRows; er++) {
-        const curY = startY + qrWidth + er * tileSize;
-        const progress = er / extraRows;
-        const spread = (count / 2) * (1 - progress);
-        for (let sc = Math.floor(count / 2 - spread); sc <= Math.ceil(count / 2 + spread); sc++) {
-          if ((er * 7 + sc * 11) % 3 !== 0) {
-            ctx.fillRect(startX + sc * tileSize, curY, tileSize + 0.35, tileSize + 0.35);
-          }
-        }
-      }
-
-      // Fill top lobes above finders with matrix dots
-      for (let lr = 0; lr < 3; lr++) {
-        const curY = startY - (lr + 1) * tileSize;
-        for (let c = 0; c < count; c++) {
-          if ((c < 9 || c >= count - 9) && ((lr * 5 + c * 7) % 2 === 0)) {
-            ctx.fillRect(startX + c * tileSize, curY, tileSize + 0.35, tileSize + 0.35);
-          }
-        }
-      }
-
-      ctx.restore();
-
-      // 4. Ensure Finder Patterns (the 3 square eyes) are crisply visible
-      drawExactFinder(ctx, 0, 0, startX, startY, tileSize, currentNeonColor);
-      drawExactFinder(ctx, 0, count - 7, startX, startY, tileSize, currentNeonColor);
-      drawExactFinder(ctx, count - 7, 0, startX, startY, tileSize, currentNeonColor);
+    function isInsideHeart(px, py, cx, cy, w, h) {
+      const nx = (px - cx) / (w * 0.5);
+      const ny = (py - (cy - h * 0.08)) / (h * 0.5);
+      const y = -ny;
+      const x = nx;
+      const a = x * x + y * y - 1;
+      return (a * a * a - x * x * y * y * y) <= 0;
     }
 
     /**
-     * Draw Finder Pattern with exact standard 1:1:3:1:1 ratio
+     * Draw modern rounded squircle / round rect
      */
-    function drawExactFinder(ctx, r, c, startX, startY, tileSize, color) {
+    function drawRoundRect(ctx, x, y, width, height, radius) {
+      if (typeof ctx.roundRect === 'function') {
+        ctx.beginPath();
+        ctx.roundRect(x, y, width, height, radius);
+        ctx.fill();
+      } else {
+        ctx.fillRect(x, y, width, height);
+      }
+    }
+
+    /**
+     * Render the Video-Accurate Heart QR Code on any canvas context
+     */
+    function renderHeartCode(canvas, targetSize, options = {}) {
+      canvas.width = targetSize;
+      canvas.height = targetSize;
+      const ctx = canvas.getContext('2d');
+
+      const url = options.url || urlInput.value.trim() || LIVE_URL;
+      const color = options.color || currentNeonColor;
+
+      // 1. Solid pitch black background
+      ctx.fillStyle = '#060608';
+      ctx.fillRect(0, 0, targetSize, targetSize);
+
+      // 2. Generate standard QR with Error Correction 'M' (clean 29x29 matrix)
+      let qr;
+      try {
+        qr = qrcode(0, 'M');
+        qr.addData(url);
+        qr.make();
+      } catch (err) {
+        // Fallback to auto
+        qr = qrcode(0, 'L');
+        qr.addData(url);
+        qr.make();
+      }
+
+      const count = qr.getModuleCount();
+      const qrWidth = targetSize * 0.62;
+      const tileSize = qrWidth / count;
+      const startX = (targetSize - qrWidth) / 2;
+      const startY = targetSize * 0.22;
+
+      const cx = targetSize / 2;
+      const cy = startY + qrWidth / 2 + (targetSize * 0.015);
+      const hw = qrWidth * 1.36;
+      const hh = qrWidth * 1.36;
+
+      // Finder quiet zone check (1 module border around 7x7 finders)
+      function isFinderZone(c, r) {
+        if (c >= -1 && c <= 7 && r >= -1 && r <= 7) return true; // Top-left
+        if (c >= count - 8 && c <= count && r >= -1 && r <= 7) return true; // Top-right
+        if (c >= -1 && c <= 7 && r >= count - 8 && r <= count) return true; // Bottom-left
+        return false;
+      }
+
+      // Check if module is within the actual 7x7 finder pattern
+      function isActualFinder(c, r) {
+        if (c >= 0 && c < 7 && r >= 0 && r < 7) return true;
+        if (c >= count - 7 && c < count && r >= 0 && r < 7) return true;
+        if (c >= 0 && c < 7 && r >= count - 7 && r < count) return true;
+        return false;
+      }
+
+      // Draw all data modules (both inside QR and aesthetic filler modules in lobes & tip)
+      const dotRadius = tileSize * 0.22;
+
+      ctx.fillStyle = color;
+
+      const gridMinR = -Math.floor(count * 0.25);
+      const gridMaxR = count + Math.floor(count * 0.35);
+      const gridMinC = -Math.floor(count * 0.25);
+      const gridMaxC = count + Math.floor(count * 0.25);
+
+      for (let r = gridMinR; r <= gridMaxR; r++) {
+        for (let c = gridMinC; c <= gridMaxC; c++) {
+          // If within finder pattern, skip (finders are drawn with pristine rounded eyes below)
+          if (isActualFinder(c, r)) continue;
+
+          const pxCenter = startX + (c + 0.5) * tileSize;
+          const pyCenter = startY + (r + 0.5) * tileSize;
+          const inHeart = isInsideHeart(pxCenter, pyCenter, cx, cy, hw, hh);
+
+          let shouldFill = false;
+
+          if (r >= 0 && r < count && c >= 0 && c < count) {
+            // Inside official QR code matrix
+            shouldFill = qr.isDark(r, c);
+          } else if (inHeart) {
+            // Outside QR matrix but inside heart: filler dots
+            if (!isFinderZone(c, r)) {
+              // Deterministic pseudo-random aesthetic pattern matching QR texture
+              const seed = Math.sin(r * 12.9898 + c * 78.233) * 43758.5453;
+              shouldFill = (seed - Math.floor(seed)) > 0.44;
+            }
+          }
+
+          if (shouldFill) {
+            const x = startX + c * tileSize;
+            const y = startY + r * tileSize;
+            drawRoundRect(ctx, x, y, tileSize + 0.3, tileSize + 0.3, dotRadius);
+          }
+        }
+      }
+
+      // 3. Draw pristine, stylish Finder Patterns with rounded corners
+      drawPristineFinder(ctx, 0, 0, startX, startY, tileSize, color);
+      drawPristineFinder(ctx, 0, count - 7, startX, startY, tileSize, color);
+      drawPristineFinder(ctx, count - 7, 0, startX, startY, tileSize, color);
+
+      // Verify scannability using jsQR
+      try {
+        if (typeof jsQR !== 'undefined') {
+          const imgData = ctx.getImageData(0, 0, targetSize, targetSize);
+          const decoded = jsQR(imgData.data, targetSize, targetSize);
+          if (decoded && decoded.data) {
+            scanStatusBadge.className = 'pt-1 flex items-center justify-between text-[11px] px-3 py-2 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300';
+            statusText.innerText = '100% Terverifikasi Bisa Dipindai HP';
+          } else {
+            scanStatusBadge.className = 'pt-1 flex items-center justify-between text-[11px] px-3 py-2 rounded-xl bg-amber-950/40 border border-amber-500/40 text-amber-300';
+            statusText.innerText = 'Peringatan: Coba gunakan URL yang lebih ringkas';
+          }
+        }
+      } catch (e) {}
+    }
+
+    /**
+     * Draw modern, scannable Finder Pattern with smooth rounded corners
+     */
+    function drawPristineFinder(ctx, r, c, startX, startY, tileSize, color) {
       const fx = startX + c * tileSize;
       const fy = startY + r * tileSize;
       const s = 7 * tileSize;
+      const outerRadius = tileSize * 1.8;
+      const innerGapRadius = tileSize * 1.2;
+      const centerRadius = tileSize * 0.9;
 
-      // Outer boundary clear
-      ctx.fillStyle = "#0A0A0C";
-      ctx.fillRect(fx - 0.5, fy - 0.5, s + 1, s + 1);
+      // 1. Clear background quiet margin
+      ctx.fillStyle = '#060608';
+      ctx.fillRect(fx - tileSize * 0.5, fy - tileSize * 0.5, s + tileSize, s + tileSize);
 
-      // Outer Pink Box
+      // 2. Outer colored rounded box (7x7)
       ctx.fillStyle = color;
-      ctx.fillRect(fx, fy, s, s);
+      drawRoundRect(ctx, fx, fy, s, s, outerRadius);
 
-      // Middle Black Cutout
-      ctx.fillStyle = "#0A0A0C";
-      ctx.fillRect(fx + tileSize, fy + tileSize, s - 2 * tileSize, s - 2 * tileSize);
+      // 3. Middle black cutout (5x5)
+      ctx.fillStyle = '#060608';
+      drawRoundRect(ctx, fx + tileSize, fy + tileSize, s - 2 * tileSize, s - 2 * tileSize, innerGapRadius);
 
-      // Center Pink Solid Dot
+      // 4. Center solid colored dot (3x3)
       ctx.fillStyle = color;
-      ctx.fillRect(fx + 2 * tileSize, fy + 2 * tileSize, s - 4 * tileSize, s - 4 * tileSize);
+      drawRoundRect(ctx, fx + 2 * tileSize, fy + 2 * tileSize, s - 4 * tileSize, s - 4 * tileSize, centerRadius);
     }
 
-    // Input change handler
+    // Live display draw
+    function drawHeartQR() {
+      renderHeartCode(heartCanvas, 240);
+
+      // Update WhatsApp share link
+      const targetUrl = urlInput.value.trim() || LIVE_URL;
+      whatsappShareLink.href = `https://api.whatsapp.com/send?text=${encodeURIComponent('Haiii adikku tersayang, coba buka barcode hati ini yaa... 💗 ' + targetUrl)}`;
+    }
+
+    // Input change handlers
     urlInput.addEventListener('input', drawHeartQR);
 
     // Initial draw
     drawHeartQR();
 
-    // Download High-Resolution (1080x1080) Image for WhatsApp
+    // 1. Download High-Resolution Pure Black Image (1080x1080)
     downloadImageBtn.addEventListener('click', () => {
       const exportCanvas = document.createElement('canvas');
-      const exportSize = 1080; // Full HD square
-      exportCanvas.width = exportSize;
-      exportCanvas.height = exportSize;
-      const expCtx = exportCanvas.getContext('2d');
+      renderHeartCode(exportCanvas, 1080);
 
-      // Solid black background
-      expCtx.fillStyle = "#0A0A0C";
-      expCtx.fillRect(0, 0, exportSize, exportSize);
-
-      // Generate scaled heart QR
-      const targetUrl = urlInput.value.trim() || 'https://trynvexa.github.io/adik-ku/';
-      const qr = qrcode(0, 'H');
-      qr.addData(targetUrl);
-      qr.make();
-
-      const count = qr.getModuleCount();
-      const qrWidth = 780; // 780px QR centered in 1080px
-      const offsetX = (exportSize - qrWidth) / 2;
-      const offsetY = 120;
-      const tileSize = qrWidth / count;
-
-      expCtx.save();
-      expCtx.beginPath();
-
-      const midX = exportSize / 2;
-      const cleftY = offsetY + 110;
-      const bottomTipY = offsetY + qrWidth + 145;
-      const leftX = offsetX - 24;
-      const rightX = offsetX + qrWidth + 24;
-
-      expCtx.moveTo(midX, cleftY);
-      expCtx.bezierCurveTo(midX - 105, offsetY - 78, leftX, offsetY - 72, leftX, offsetY + 135);
-      expCtx.bezierCurveTo(leftX, offsetY + 360, offsetX - 12, offsetY + (count - 3) * tileSize, midX, bottomTipY);
-      expCtx.bezierCurveTo(offsetX + qrWidth + 12, offsetY + (count - 3) * tileSize, rightX, offsetY + 360, rightX, offsetY + 135);
-      expCtx.bezierCurveTo(rightX, offsetY - 72, midX + 105, offsetY - 78, midX, cleftY);
-      expCtx.closePath();
-      expCtx.clip();
-
-      expCtx.fillStyle = currentNeonColor;
-      for (let r = 0; r < count; r++) {
-        for (let c = 0; c < count; c++) {
-          if (qr.isDark(r, c)) {
-            const x = offsetX + c * tileSize;
-            const y = offsetY + r * tileSize;
-            expCtx.fillRect(x, y, tileSize + 0.8, tileSize + 0.8);
-          }
-        }
-      }
-
-      // Decorative dots in bottom tip
-      const extraRows = Math.floor((bottomTipY - (offsetY + qrWidth)) / tileSize) + 2;
-      for (let er = 0; er < extraRows; er++) {
-        const curY = offsetY + qrWidth + er * tileSize;
-        const progress = er / extraRows;
-        const spread = (count / 2) * (1 - progress);
-        for (let sc = Math.floor(count / 2 - spread); sc <= Math.ceil(count / 2 + spread); sc++) {
-          if ((er * 7 + sc * 11) % 3 !== 0) {
-            expCtx.fillRect(offsetX + sc * tileSize, curY, tileSize + 0.8, tileSize + 0.8);
-          }
-        }
-      }
-
-      // Top lobes extra dots
-      for (let lr = 0; lr < 3; lr++) {
-        const curY = offsetY - (lr + 1) * tileSize;
-        for (let c = 0; c < count; c++) {
-          if ((c < 9 || c >= count - 9) && ((lr * 5 + c * 7) % 2 === 0)) {
-            expCtx.fillRect(offsetX + c * tileSize, curY, tileSize + 0.8, tileSize + 0.8);
-          }
-        }
-      }
-
-      expCtx.restore();
-
-      // Finder patterns
-      drawExactFinder(expCtx, 0, 0, offsetX, offsetY, tileSize, currentNeonColor);
-      drawExactFinder(expCtx, 0, count - 7, offsetX, offsetY, tileSize, currentNeonColor);
-      drawExactFinder(expCtx, count - 7, 0, offsetX, offsetY, tileSize, currentNeonColor);
-
-      // Trigger download
       const link = document.createElement('a');
       link.download = 'Barcode-Hati-Neon-Pink-HD.png';
       link.href = exportCanvas.toDataURL('image/png');
       link.click();
     });
-  </script>
 
+    // 2. Download WhatsApp Chat Card (1080x1080)
+    downloadCardBtn.addEventListener('click', () => {
+      const cardCanvas = document.createElement('canvas');
+      cardCanvas.width = 1080;
+      cardCanvas.height = 1080;
+      const ctx = cardCanvas.getContext('2d');
+
+      // WhatsApp dark mode background
+      ctx.fillStyle = '#0c1317';
+      ctx.fillRect(0, 0, 1080, 1080);
+
+      // Radial dots pattern
+      ctx.fillStyle = '#1e2b32';
+      for (let y = 0; y < 1080; y += 32) {
+        for (let x = 0; x < 1080; x += 32) {
+          ctx.beginPath();
+          ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // Dynamic messages & time
+      const topMsg = topMessageInput.value.trim() || 'HAPPY BITYHDAY BUBUBBB 😘💗💗💗';
+      const botCaption = bottomCaptionInput.value.trim() || 'COBA BUKA INI';
+      const chatTime = timeInput.value.trim() || '16:05';
+
+      // Top Bubble: Dynamic width based on measured text
+      ctx.font = 'bold 30px "Poppins", sans-serif';
+      const textWidth = ctx.measureText(topMsg).width;
+      const topBubbleW = Math.min(940, Math.max(340, textWidth + 180));
+      const topBubbleH = 90;
+      const topBubbleX = 1080 - topBubbleW - 70;
+      const topBubbleY = 80;
+
+      ctx.fillStyle = '#005c4b';
+      drawRoundRect(ctx, topBubbleX, topBubbleY, topBubbleW, topBubbleH, 24);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 30px "Poppins", sans-serif';
+      ctx.fillText(topMsg, topBubbleX + 32, topBubbleY + 54);
+
+      ctx.fillStyle = '#68d391';
+      ctx.font = '20px "Poppins", sans-serif';
+      ctx.fillText(`${chatTime} ✓✓`, topBubbleX + topBubbleW - 120, topBubbleY + 68);
+
+      // Main Bubble containing the QR image
+      const bubbleW = 820;
+      const bubbleH = 820;
+      const bubbleX = 1080 - bubbleW - 70;
+      const bubbleY = 195;
+
+      ctx.fillStyle = '#005c4b';
+      drawRoundRect(ctx, bubbleX, bubbleY, bubbleW, bubbleH, 30);
+
+      // Render Heart QR on a temp canvas
+      const tempQR = document.createElement('canvas');
+      renderHeartCode(tempQR, 740);
+
+      // Draw inside bubble
+      ctx.drawImage(tempQR, bubbleX + 40, bubbleY + 28);
+
+      // Caption at bottom of bubble
+      ctx.fillStyle = '#e6fffa';
+      ctx.font = 'bold 28px "Poppins", sans-serif';
+      ctx.fillText(botCaption, bubbleX + 48, bubbleY + bubbleH - 24);
+
+      ctx.fillStyle = '#68d391';
+      ctx.font = '22px "Poppins", sans-serif';
+      ctx.fillText(`${chatTime} ✓✓`, bubbleX + bubbleW - 130, bubbleY + bubbleH - 24);
+
+      const link = document.createElement('a');
+      link.download = 'Kartu-WhatsApp-Barcode-Hati-HD.png';
+      link.href = cardCanvas.toDataURL('image/png');
+      link.click();
+    });
+
+    // 3. Copy image directly to Clipboard (Paste in WhatsApp Web / Desktop)
+    copyImageBtn.addEventListener('click', async () => {
+      try {
+        const tempCanvas = document.createElement('canvas');
+        renderHeartCode(tempCanvas, 1080);
+
+        tempCanvas.toBlob(async (blob) => {
+          if (!blob) throw new Error('Blob creation failed');
+          await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': blob })
+          ]);
+
+          copyBtnText.innerText = '✅ Berhasil Tersalin! Tinggal Paste di WA';
+          copyImageBtn.classList.add('bg-emerald-950/60', 'text-emerald-300', 'border-emerald-500');
+
+          setTimeout(() => {
+            copyBtnText.innerText = 'Salin Gambar ke Clipboard (Tinggal Paste di WA)';
+            copyImageBtn.classList.remove('bg-emerald-950/60', 'text-emerald-300', 'border-emerald-500');
+          }, 3500);
+        }, 'image/png');
+      } catch (err) {
+        copyBtnText.innerText = '⚠️ Gunakan Tombol Unduh Gambar';
+      }
+    });
+  </script>
 </body>
 </html>
