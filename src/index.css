@@ -1,0 +1,79 @@
+@import "./styles/animations.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-soft-pink: #F8C8DC;
+  --color-pastel-pink: #FADADD;
+  --color-magenta: #D63384;
+  --color-deep-magenta: #A41363;
+  --color-dark-purple: #2D0B2E;
+  --color-cream: #FFF7F0;
+  --color-soft-purple: #E8D9F5;
+}
+
+html,
+body {
+  height: 100%;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background-color: var(--color-dark-purple);
+  color: #2D0B2E;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Custom scrollbar for mobile / desktop */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(45, 11, 46, 0.1);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(214, 51, 132, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(214, 51, 132, 0.7);
+}
+
+@layer components {
+  /* Warm linen paper used by every scrapbook sheet. Kept as a real CSS
+     class so it cannot accidentally inherit gradient variables from the
+     dark app background. */
+  .scene-paper {
+    background-color: #fffaf5;
+    background-image: linear-gradient(
+      180deg,
+      rgba(255, 253, 249, 0.97) 0%,
+      rgba(255, 243, 247, 0.95) 100%
+    );
+  }
+}
+
+@layer utilities {
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .pt-safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  .pb-safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
