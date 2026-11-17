@@ -104,7 +104,7 @@
 
     <!-- Back to site -->
     <div class="text-center pt-2">
-      <a href="/" class="text-xs text-pink-300/80 hover:text-pink-200 underline font-poppins">← Kembali ke Halaman Utama</a>
+      <a href="./" class="text-xs text-pink-300/80 hover:text-pink-200 underline font-poppins">← Kembali ke Halaman Utama</a>
     </div>
   </div>
 
@@ -113,6 +113,14 @@
     const qrcodeContainer = document.getElementById('qrcode');
     const urlDisplay = document.getElementById('urlDisplay');
     let qrInstance = null;
+
+    // Auto-detect current host & path if accessed on web
+    try {
+      if (window.location.protocol.startsWith('http')) {
+        const liveUrl = window.location.href.split('?')[0].replace(/\/qr\.html\/?$/, '');
+        if (liveUrl) urlInput.value = liveUrl;
+      }
+    } catch (e) {}
 
     function renderQR(url) {
       qrcodeContainer.innerHTML = '';

@@ -273,7 +273,7 @@ export default function MiniPlayer() {
             {/* Quick link to generate printable Love QR Barcode Card */}
             <div className="mt-2 pt-1 border-t border-soft-pink/20 text-center">
               <a
-                href="/qr.html"
+                href="./qr.html"
                 target="_blank"
                 rel="noreferrer"
                 className="text-[10px] font-dancing text-magenta hover:underline font-bold inline-flex items-center gap-1"

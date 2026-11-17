@@ -82,9 +82,9 @@ export default function MusicScene({ onNext }) {
     onNext();
   };
 
-  const currentPhoto = memories[photoIndex] || {
+  const currentPhoto = memories[photoIndex] || memories[0] || {
     id: 1,
-    src: '/images/photo-1.jpg',
+    src: './images/photo-1.jpg',
     caption: 'Senyum manismu',
   };
 
